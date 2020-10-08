@@ -63,12 +63,12 @@ def init(func, gamemode):
     main_menu_picks[func]()
 
 
-def one_player_game(): #tryb jednoosobowy (trudne)
-    selection_phase(1)
+def one_player_game(num): #tryb jednoosobowy (trudne)
+    pass
 
 
-def two_player_game(): #tryb dwuosobowy (średnie)
-    selection_phase(2)
+def two_player_game(num): #tryb dwuosobowy (średnie)
+    pass
 
 
 def selection_phase():
