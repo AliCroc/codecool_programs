@@ -5,17 +5,21 @@ import sys
 
 gamemode_nr = 0
 vibe_check = 0
-board_1 = {}
-board_2 = {}
+board_ships_1 = {}
+board_ships_2 = {}
+board_hits_1 = {}
+board_hits_2 = {}
 entry_field_val = 0
 
 
 def erase_previous_data():
-    global gamemode_nr, vibe_check, board_1, board_2
+    global gamemode_nr, vibe_check, board_ships_1, board_ships_2, board_hits_1, board_hits_2
     gamemode_nr = 0
     vibe_check = 0
-    board_1 = {}
-    board_2 = {}
+    board_ships_1 = {}
+    board_ships_2 = {}
+    board_hits_1 = {}
+    board_hits_2 = {}
 
 # from pynput.keyboard import Key, Listener
 
@@ -55,10 +59,10 @@ def exit_game():
         main_menu()
 
 
-
-
 def init(func, gamemode):
     global gamemode_nr
+    if func in selection_phase_picks.values():
+        func()
     gamemode_nr = int(gamemode)
     main_menu_picks[func]()
 
@@ -77,12 +81,13 @@ def selection_phase():
     option_nr = input("\nSelect game preset you want to use:\n(1) Long Battle\n(2) Quick Joust\n(3) Custom Game\n(4) Go back to main menu\n")
     if option_nr in selection_phase_picks.keys():
         if (str(selection_phase_picks[option_nr])).isdigit() == True:
-            if gamemode_nr == 1:
-                one_player_game(selection_phase_picks[option_nr])
-            elif gamemode_nr == 2:
-                two_player_game(selection_phase_picks[option_nr])
-            else:
-                error("Type of game is neither single- or multiplayer, please check data cohesion")
+            board_create(selection_phase_picks[option_nr])
+            # if gamemode_nr == 1:
+            #     one_player_game(selection_phase_picks[option_nr])
+            # elif gamemode_nr == 2:
+            #     two_player_game(selection_phase_picks[option_nr])
+            # else:
+            #     error("Type of game is neither single- or multiplayer, please check data cohesion")
         else:
             try:
                 init(selection_phase_picks[option_nr], selection_phase_picks[option_nr])
@@ -106,10 +111,27 @@ def main_menu():
             print("Wrong input, please try again")
             time.sleep(1)
 
+def board_create(count):
+    global alphabet, entry_field_val, board_ships_1, board_ships_2, board_hits_1, board_hits_2
+    current_nr = 1
+    for rows_n_cols in range(int(count)):
+        for letter in alphabet[0:count]:
+            dict_key_input = letter + str(rows_n_cols+1)
+            board_ships_1[dict_key_input] = "[0]"
+            board_ships_2[dict_key_input] = "[0]"
+            board_hits_1[dict_key_input] = "[0]"
+            board_hits_2[dict_key_input] = "[0]"
+
+
+def print_board(dict):
+    global alphabet
+    print(' '.join(letter for letter in dict))
+    # for
+
+
 
 
 def custom():
-    global board_1, board_2, alphabet, entry_field_val
     while True:
         cls()
         nr_of_rows_and_cols = input("\nType in a number of custom rows and columns you would like to play with (maximum is 20)")
@@ -118,10 +140,10 @@ def custom():
                 print("Sorry, but max rows and columns count is 20, please readjust your pick")
                 time.sleep(1.5)
                 continue
-            current_nr=1
-            for rows_n_cols in range(int(nr_of_rows_and_cols)+1):
-                dict_key_input = str(alphabet[current_nr-1]+rows_n_cols)
-                board_1[dict_key_input]=f"[ {entry_field_val} ]"
+            board_create(int(nr_of_rows_and_cols))
+        else:
+            print("Wrong input")
+            time.sleep(1.5)
 
 
 
