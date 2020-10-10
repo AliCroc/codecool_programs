@@ -127,11 +127,13 @@ def board_create(count):
 def print_board(dict, count): #słownik do drukowania oraz liczba komórek na wiersz
     global alphabet
     current_row = []
-    print(" "+'  '.join(letter for letter in alphabet))
+    current_row_nr = 1
+    print("   "+'  '.join(letter for letter in alphabet))
     for cell in dict.values():
         current_row.append(cell)
         if len(current_row) % count == 0:
-            print(' '.join(str(x) for x in current_row))
+            print(current_row_nr, " "+(' '.join(str(x) for x in current_row)))
+            current_row_nr += 1
             current_row.clear()
 
 
