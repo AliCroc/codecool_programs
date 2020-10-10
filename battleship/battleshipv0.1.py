@@ -10,12 +10,13 @@ board_ships_2 = {}
 board_hits_1 = {}
 board_hits_2 = {}
 entry_field_val = 0
-
+nr_of_rows = 0
 
 def erase_previous_data():
-    global gamemode_nr, vibe_check, board_ships_1, board_ships_2, board_hits_1, board_hits_2
+    global gamemode_nr, vibe_check, board_ships_1, board_ships_2, board_hits_1, board_hits_2, nr_of_rows
     gamemode_nr = 0
     vibe_check = 0
+    nr_of_rows = 0
     board_ships_1 = {}
     board_ships_2 = {}
     board_hits_1 = {}
@@ -92,11 +93,10 @@ def selection_phase():
             try:
                 init(selection_phase_picks[option_nr], selection_phase_picks[option_nr])
             except:
-                error("Type of game is neither of available picks, please check it went past 'if option_nr in selection_phase_picks.keys()' statement")
+                error("Type of game is neither of available picks, please check how it went past 'if option_nr in selection_phase_picks.keys()' statement")
     else:
         print("Wrong input, please try again")
         time.sleep(1)
-
 
 
 def main_menu():
@@ -111,24 +111,28 @@ def main_menu():
             print("Wrong input, please try again")
             time.sleep(1)
 
+
 def board_create(count):
-    global alphabet, entry_field_val, board_ships_1, board_ships_2, board_hits_1, board_hits_2
-    current_nr = 1
+    global alphabet, entry_field_val, board_ships_1, board_ships_2, board_hits_1, board_hits_2, nr_of_rows
+    nr_of_rows = count
     for rows_n_cols in range(int(count)):
         for letter in alphabet[0:count]:
             dict_key_input = letter + str(rows_n_cols+1)
-            board_ships_1[dict_key_input] = "[0]"
-            board_ships_2[dict_key_input] = "[0]"
-            board_hits_1[dict_key_input] = "[0]"
-            board_hits_2[dict_key_input] = "[0]"
+            board_ships_1[dict_key_input] = " 0 "
+            board_ships_2[dict_key_input] = " 0 "
+            board_hits_1[dict_key_input] = " 0 "
+            board_hits_2[dict_key_input] = " 0 "
 
 
-def print_board(dict):
+def print_board(dict, count): #słownik do drukowania oraz liczba komórek na wiersz
     global alphabet
-    print(' '.join(letter for letter in dict))
-    # for
-
-
+    current_row = []
+    print(" "+'  '.join(letter for letter in alphabet))
+    for cell in dict.values():
+        current_row.append(cell)
+        if len(current_row) % count == 0:
+            print(' '.join(str(x) for x in current_row))
+            current_row.clear()
 
 
 def custom():
