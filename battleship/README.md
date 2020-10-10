@@ -6,3 +6,5 @@ Final goal features:
 - user friendly features, such us secret exit word or easy-to-set game mechanic
 - colored game board
 - sounds
+
+currently only comments are in polish, but a code itself is wrote in english (i hope it's not-so-hard to understand ^^)
