@@ -4,44 +4,29 @@ import sys
 
 
 gamemode_nr = 0
-vibe_check = 0
+# vibe_check = 0
 board_ships_1 = {}
 board_ships_2 = {}
 board_hits_1 = {}
 board_hits_2 = {}
 entry_field_val = 0
 nr_of_rows = 0
+emergency_exit_word = "quit"
 
 def erase_previous_data():
-    global gamemode_nr, vibe_check, board_ships_1, board_ships_2, board_hits_1, board_hits_2, nr_of_rows
+    global gamemode_nr, board_ships_1, board_ships_2, board_hits_1, board_hits_2, nr_of_rows    # vibe_check,
     gamemode_nr = 0
-    vibe_check = 0
+    # vibe_check = 0
     nr_of_rows = 0
     board_ships_1 = {}
     board_ships_2 = {}
     board_hits_1 = {}
     board_hits_2 = {}
 
-# from pynput.keyboard import Key, Listener
-
-
-# def emergency_escape(key):
-#     if key == Key.esc:
-#         yn = input("Wciśnięto awaryjny przycisk wyjścia; czy na pewno chcesz wyjść? Y/N").upper()
-#         if yn == "Y":
-#             sys.exit(0)
-#
-#
-# # nasłuchiwacz przycisku "Escape"
-#
-# with Listener(
-#         on_release=emergency_escape) as listener:
-#     listener.join()
-
 
 def start():
-    print("Hello and welcome to our Battleship game!")
-    time.sleep(1.5)
+    print("Hello and welcome to our Battleship game!\n Are you ready for real battle?")
+    time.sleep(2.5)
     main_menu() #menu startowe z wyborem między single i multiplayer
 
 
@@ -69,11 +54,16 @@ def init(func, gamemode):
 
 
 def one_player_game(num): #tryb jednoosobowy (trudne)
-    pass
+    player_name = input("Type in your nickname, capitan!")
+    cls()
+    print("Alright", player_name, ", it's time to set your fleet")
+    time.sleep(2.5)
+    cls()
+    arrange_ships(num)
 
 
 def two_player_game(num): #tryb dwuosobowy (średnie)
-    pass
+    print("Two")
 
 
 def selection_phase():
@@ -83,17 +73,14 @@ def selection_phase():
     if option_nr in selection_phase_picks.keys():
         if (str(selection_phase_picks[option_nr])).isdigit() == True:
             board_create(selection_phase_picks[option_nr])
-            # if gamemode_nr == 1:
-            #     one_player_game(selection_phase_picks[option_nr])
-            # elif gamemode_nr == 2:
-            #     two_player_game(selection_phase_picks[option_nr])
-            # else:
-            #     error("Type of game is neither single- or multiplayer, please check data cohesion")
         else:
             try:
                 init(selection_phase_picks[option_nr], selection_phase_picks[option_nr])
             except:
                 error("Type of game is neither of available picks, please check how it went past 'if option_nr in selection_phase_picks.keys()' statement")
+        if option_nr in ["1","2"]:
+            gamemode_choice = (two_player_game if gamemode_nr == 2 else one_player_game)
+            gamemode_choice(selection_phase_picks[option_nr])
     else:
         print("Wrong input, please try again")
         time.sleep(1)
@@ -138,6 +125,7 @@ def print_board(dict, count): #słownik do drukowania oraz liczba komórek na wi
 
 
 def custom():
+    global gamemode_nr
     while True:
         cls()
         nr_of_rows_and_cols = input("\nType in a number of custom rows and columns you would like to play with (maximum is 20)")
@@ -147,12 +135,15 @@ def custom():
                 time.sleep(1.5)
                 continue
             board_create(int(nr_of_rows_and_cols))
+            gamemode_choice = (two_player_game if gamemode_nr == 2 else one_player_game)
+            gamemode_choice(nr_of_rows_and_cols)
         else:
             print("Wrong input")
             time.sleep(1.5)
 
 
-
+def arrange_ships(num):
+    pass
 
 
 main_menu_picks = {"1": selection_phase, "2": selection_phase, "3": instructions, "4": exit_game} #dict z opcjami menu, umiejscowione tu dla pewności, że program nie wywali się przez brak zdefiniowania którejś opcji z menu
