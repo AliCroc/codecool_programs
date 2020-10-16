@@ -57,13 +57,15 @@ def exit_game():
 
 
 def init(func, gamemode):
-    global gamemode_nr, selection_phase_picks
-    if func in selection_phase_picks.values():
-        func()
-    if func == "7":
-        instructions()
-    gamemode_nr = int(gamemode)
-    main_menu_picks[func]()
+    global gamemode_nr
+    if func not in main_menu_picks.keys():
+        if func == "7":
+            instructions()
+        else:
+            func()
+    else:
+        gamemode_nr = int(gamemode)
+        main_menu_picks[func]()
 
 
 def one_player_game(num): #tryb jednoosobowy (trudne)
@@ -119,17 +121,17 @@ def main_menu():
 
 
 def board_create(count):
-    global alphabet, fields_val, board_ships_1, board_ships_2, board_hits_1, board_hits_2, nr_of_rows, cell_values
+    global alphabet, fields_val, board_ships_1, board_ships_2, board_hits_1, board_hits_2, nr_of_rows, cell_values1, cell_values2
     nr_of_rows = count
     for rows_n_cols in range(int(count)):
         for letter in alphabet[0:count]:
             dict_key_input = letter + str(rows_n_cols+1)
-            board_ships_1[dict_key_input] = " 0 "
-            board_ships_2[dict_key_input] = " 0 "
-            board_hits_1[dict_key_input] = " 0 "
-            board_hits_2[dict_key_input] = " 0 "
-            cell_values.append(0)
-
+            board_ships_1[dict_key_input] = "[ ]"  # te słowniki odpowiedzialne są za graficzne przestawienie gry
+            board_ships_2[dict_key_input] = "[ ]"
+            board_hits_1[dict_key_input] = "[ ]"
+            board_hits_2[dict_key_input] = "[ ]"
+            cell_values1.append("[ ]")  # ta lista odpowiedzialna jest za poprawność rozgrywki i mózg komputera
+            cell_values1.append("[ ]")
 
 
 def print_board(dict, count): #słownik do drukowania oraz liczba komórek na wiersz
@@ -166,23 +168,57 @@ def custom():
             time.sleep(1.5)
 
 
-# def set_logic(num, list, level):
-#     available_spaces = int(((int(num))**2)*level) #
-#
-#     return list
-
-
 def arrange_ships(num):
-    ship_picks = []
+    global board_ships_1, board_ships_2
     game_settings = game_difficulty(num)
-    # ship_picks = set_logic(game_settings[0])
+    max_possible_places = game_settings[0]
+    bot_level = game_settings[1]
+    ship_picks = [0,0,0,0]
+    skip = False
+    while True:
+        cls()
+        print_board(board_ships_1)
+        current_state = ship_placement_sequence(num, max_possible_places,ship_picks,skip)
+        if skip == True:
+            break
+
+def ship_placement_sequence(num,spaces,ships,skip):
+    global ships_list
+    while True:
+        possible_ships_picks = what_is_available(num,spaces)
+        print(f"You have {spaces} spaces left for you to place your fleet at.\n")
+        time.sleep(0.5)
+        print(f"""
+            1            2               3           4   
+        Carriers: {possible_ships_picks[0]} Battleship: {possible_ships_picks[1]} Cruiser/Submarine: {possible_ships_picks[2]} Partol Boat: {possible_ships_picks[3]}
+        """)
+        ship = input("Choose your ships by typing in it's number (displayed a maximum amount of each class and how much spaces they take)\n")
+        if ship in ships_list.keys():
+            ships[(int(ship))-1]+=1
+        else:
+            print("Wrong input")
+            time.sleep(1)
+        return ships, spaces
+
+
+def what_is_available(num,spaces):
+    if num < 7:
+        if spaces < 20:
+            return [0,(spaces // 4)-1, spaces // 3, spaces // 2]
+        else:
+            return [spaces//20,(spaces // 4)-1, spaces // 3, spaces // 2]
+    else:
+        if num < 12:
+            return [int((spaces//20)*0.5),int((spaces // 4)*0.8), spaces // 3, int((spaces // 2)*0.2)]
+        else:
+            return [int((spaces // 20) * 0.8), spaces // 4, int((spaces // 3) * 0.5), int((spaces // 2)*0.05)]
 
 
 def game_difficulty(num):
     global density_levels_menu, bot_difficulty_levels
     while True:
         cls()
-        dif_preset = input("Choose game preset or select \"custom\" option for custom settings:\n(1) Easy (almost 1 in 2 chance for hit and a baby as an opponent(not recommanded for small boards!))\n(2) Medium (normal hit chance and focused opponent)\n(3) Hard (a challanging opponent with well hidden fleet)\n(4) Master (fight against experienced capitan and WW2 veteran, who won't give you a chance)\n(5) Godlike (your enemy litterly have a sonar and you are outnumbered)\n(6) Custom ship density and opponent difficulty\n(7) Instructions")
+        dif_preset = input("Choose game preset or select \"custom\" option for custom settings:\n(1) Easy (almost 1 in 2 chance for hit and a baby as an opponent(not recommanded for small boards!))\n(2) Medium (normal hit chance and focused opponent)\n(3) Hard (a challanging opponent with well hidden fleet)\n(4) Master (fight against experienced capitan and WW2 veteran, who won't give you a chance)\n(5) Godlike (your enemy litterly have a sonar)\n(6) Custom ship density and opponent difficulty\n(7) Instructions \n(8) Go back to main menu (erases all current settings)\n")
         if dif_preset == "7":
             init(dif_preset, dif_preset)
             break
@@ -206,7 +242,7 @@ def available_spaces_calc(num, preset, bot):
             bot -= 1
     else:
         error("Invalid dif_preset value, please check code for defects")
-    return available_spaces, bot_difficulty_levels[bot]
+    return available_spaces, bot_difficulty_levels[bot]   # liczba, 1/2/3/4
 
 
 def custom_difficulty(num):
@@ -238,7 +274,7 @@ selection_phase_picks = {"1": 10, "2": 5, "3": custom, "4": main_menu} #dict z o
 alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "Q", "P", "R", "S", "T"]
 density_levels_menu = {"1": 0.5, "2": 0.4, "3": 0.4, "4": 0.3, "5": 0.2, "7": instructions}
 bot_difficulty_levels = {1: "easy", 2: "medium", 3: "hard", 4: "very hard"}
-ships = {"1": 5, "2": 4, "3": 3, "4": 3, "5": 2}
+ships_list = {"1": 5, "2": 4, "3": 3, "4": 2}
 
 def cls():
     os.system('cls')
